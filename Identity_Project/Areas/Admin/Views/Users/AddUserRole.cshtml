@@ -1,0 +1,35 @@
+﻿@using Identity_Project.Areas.Admin.Models.DTOs.UserDTOs;
+@model AddUserRoleDTO
+@{
+    ViewData["Title"] = "AddUserRoleDTO";
+}
+<h1>Add Roles to @Model.Fullname</h1>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="AddUserRole" asp-controller="Users" method="post">
+            @if (TempData["Errors"] != null)
+            {
+                <div class="alert alert-danger">
+                    <text>@TempData["Errors"]</text>
+                </div>
+            }
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="Role" class="control-label"></label>
+                <select asp-for="Role" asp-items="Model.Roles" class="form-control"></select>
+                <span asp-validation-for="Role" class="text-danger"></span>
+            </div>
+            <br />
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" /> | <a asp-action="Index" class="btn btn-info">Back to List</a>
+            </div>
+        </form>
+    </div>
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

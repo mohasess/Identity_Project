@@ -24,7 +24,8 @@ builder.Services.AddIdentity<User, Role>()
     .AddEntityFrameworkStores<MADbContext>()
     .AddDefaultTokenProviders();
 
-
+builder.Services.AddScoped<RoleManager<Role>>();
+builder.Services.AddScoped<UserManager<User>>();
 
 
 AutoMapperConfig.Configuration();

@@ -1,0 +1,36 @@
+﻿@using Identity_Project.Areas.Admin.Models.DTOs.UserDTOs;
+@model UserRolesDTO
+@{
+    ViewData["Title"] = "UserRoles";
+}
+
+<h1>Roles list of user @Model.Fullname</h1>
+<h2>With Email : @Model.Email</h2>
+
+<br />
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Role name
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+            @foreach (var role in Model.Roles)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => role)
+                    </td>
+                </tr>
+
+            }
+    </tbody>
+</table>
+<br />
+
+<p>
+    <a asp-action="AddUserRole" asp-controller="Users" asp-route-id="@Model.Id" class="btn btn-success">Assign new role</a>
+</p>
+
