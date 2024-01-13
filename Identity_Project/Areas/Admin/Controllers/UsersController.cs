@@ -21,7 +21,7 @@ namespace Identity_Project.Areas.Admin.Controllers
 
         public IActionResult Index()
         {
-            var users = _userManager.Users.Where(u => u.LockoutEnabled == false).Select(u => new UserListDTO()
+            var users = _userManager.Users.Where(u => u.EmailConfirmed == true).Select(u => new UserListDTO()
             {
                 Id = u.Id,
                 Firstname = u.Firstname,
@@ -48,7 +48,7 @@ namespace Identity_Project.Areas.Admin.Controllers
             var result = _userManager.CreateAsync(user, registerDTO.Password).Result;
             var messages = "";
             if (result.Succeeded)
-                return RedirectToAction("Index", "UsersController", new { area = "Admin"});
+                return RedirectToAction("Index","Users", new { area = "Admin"});
 
             foreach (var error in result.Errors)
             {
@@ -93,10 +93,10 @@ namespace Identity_Project.Areas.Admin.Controllers
             {
                 var result = _userManager.DeleteAsync(user).Result;
                 if (result.Succeeded)
-                    return RedirectToAction("Index", "UsersController", new { area = "Admin" });
+                    return RedirectToAction("Index", "Users", new { area = "Admin" });
             }
             TempData["DeleteFailed"] = "Delete faile - please try again!";
-            return RedirectToAction("Index", "UsersController", new { area = "Admin"});
+            return RedirectToAction("Index", "Users", new { area = "Admin"});
         }
         public IActionResult AddUserRole(string id)
         {

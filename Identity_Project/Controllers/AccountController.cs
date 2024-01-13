@@ -11,11 +11,13 @@ namespace Identity_Project.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
+        private readonly EmailService _emailService;
 
         public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _emailService = new EmailService();
         }
 
         public IActionResult Register()
@@ -37,8 +39,13 @@ namespace Identity_Project.Controllers
             var result = _userManager.CreateAsync(user,registerDTO.Password).Result;
             var messages = "";
             if (result.Succeeded)
-                return RedirectToAction("Index", "Home");
-
+            {
+                var token = _userManager.GenerateEmailConfirmationTokenAsync(user).Result;
+                var combackUrl = Url.Action("ConfirmEmail", "Account", new { token = token, id = user.Id }, protocol: Request.Scheme);
+                var body = string.Format($"از طریق لینک زیر حساب کاربری خود را فعال سازی کنید <br/> <a href={combackUrl}>لینک فعال سازی</a>");
+                _emailService.SendEmail(user.Email, body, "تایید حساب کاربری");
+                return RedirectToAction("DisplayEmail", "Account", new { email = user.Email});
+            }
             foreach (var error in result.Errors)
             {
                 messages += error.Description + Environment.NewLine;
@@ -46,6 +53,32 @@ namespace Identity_Project.Controllers
 
             TempData["Messages"] = messages;
             return View(registerDTO);
+        }
+        public IActionResult DisplayEmail(string email)
+        {
+            ViewBag.Email = email;
+            return View();
+        }
+        public IActionResult ConfirmEmail(string token, string id)
+        {
+            if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(id))
+            {
+                return NotFound();
+            }
+            var user = _userManager.FindByIdAsync(id).Result;
+            var result = _userManager.ConfirmEmailAsync(user, token).Result;
+            var errors = "";
+            if (result.Succeeded)
+            {
+                TempData["ConfirmEmail"] = "اکانت شما با موفقیت فعال سازی شد";
+                return RedirectToAction("Login", "Account");
+            }
+            foreach (var error in result.Errors)
+            {
+                errors += error.Description + Environment.NewLine; 
+            }
+            TempData["Errors"] = errors;
+            return View();
         }
 
         public IActionResult Login(string returnUrl = "/")
@@ -99,11 +132,51 @@ namespace Identity_Project.Controllers
             return View(loginDTO);
         }
 
-
         public IActionResult LogOut()
         {
             _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
+        }
+        public IActionResult ForgetPassword()
+        {
+            return View();
+        }
+        [HttpPost]
+        public IActionResult ForgetPassword(ForgetPasswordDTO forgetPasswordDTO)
+        {
+            var user = _userManager.FindByEmailAsync(forgetPasswordDTO.Email.ToLower().Trim()).Result;
+            var token = _userManager.GeneratePasswordResetTokenAsync(user).Result;
+            var combackUrl = Url.Action("ResetPassword", "Account", new { token = token, id = user.Id }, protocol: Request.Scheme);
+            var body = string.Format($"از طریق لینک زیر نسبت به تغییر رمز خود اقدام نمایید <br/> <a href={combackUrl}>لینک تغییر رمز کاربری</a>");
+            _emailService.SendEmail(user.Email, body, "تغییر رمز کاربری");
+            TempData["ResetPasswordEmailSent"] = "ایمیلی حاوی لینک تغییر رمز حساب کاربری برای شما ارسال شد";
+            return View();
+        }
+        public IActionResult ResetPassword(string token, string id)
+        {
+            return View(new ResetPasswordDTO()
+            {
+                Id = id,
+                token = token,
+            });
+        }
+        [HttpPost]
+        public IActionResult ResetPassword(ResetPasswordDTO resetPassword)
+        {
+            var user = _userManager.FindByIdAsync(resetPassword.Id).Result;
+            var result = _userManager.ResetPasswordAsync(user, resetPassword.token, resetPassword.Password).Result;
+            if (result.Succeeded)
+            {
+                TempData["ResetPasswordDone"] = "تغییر رمز با موفقیت انجام شد!";
+                return RedirectToAction("Login", "Account");
+            }
+            var errors = "";
+            foreach (var error in result.Errors)
+            {
+                errors += error.Description + Environment.NewLine;
+            }
+            TempData["Errors"] = errors;
+            return View();
         }
     }
 }

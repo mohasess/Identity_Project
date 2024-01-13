@@ -21,7 +21,7 @@ namespace Identity_Project.Data
             builder.Entity<IdentityUserRole<string>>().HasKey(keys => new { keys.UserId, keys.RoleId });
             builder.Entity<IdentityUserToken<string>>().HasKey(keys => new { keys.UserId, keys.LoginProvider, keys.Name });
 
-            builder.Entity<User>().Ignore(p => p.NormalizedEmail);
+            //builder.Entity<User>().Ignore(p => p.NormalizedEmail);
 
             //builder.Entity<SelectListGroup>().HasNoKey();
             //builder.Entity<SelectListItem>().HasNoKey();

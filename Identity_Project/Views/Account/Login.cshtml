@@ -4,6 +4,18 @@
 }
 <h1>Login</h1>
 <hr />
+@if (TempData["ConfirmEmail"] != null)
+{
+    <div class="alert alert-success">
+        <text>@TempData["ConfirmEmail"]</text>
+    </div>
+}
+@if (TempData["ResetPasswordDone"] != null)
+{
+    <div class="alert alert-success">
+        <text>@TempData["ResetPasswordDone"]</text>
+    </div>
+}
 <div class="row">
     <div class="col-md-4">
         @if (TempData["Errors"] != null)
@@ -36,6 +48,10 @@
             </div>
         </form>
     </div>
+</div>
+<br />
+<div>
+    <a asp-controller="Account" asp-action="ForgetPassword" style="color:darkred; text-decoration:none">Forget your password?</a>
 </div>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
