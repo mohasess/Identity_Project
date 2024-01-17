@@ -1,9 +1,7 @@
 ﻿@model Identity_Project.Areas.Admin.Models.DTOs.RoleDTOs.RoleEditDTO
-
 @{
     ViewData["Title"] = "Edit";
 }
-
 <h1>Edit Role @Model.Name</h1>
 <br />
 <hr />
@@ -29,8 +27,6 @@
         </form>
     </div>
 </div>
-
-
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

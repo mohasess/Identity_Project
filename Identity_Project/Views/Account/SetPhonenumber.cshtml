@@ -1,0 +1,35 @@
+﻿@using Identity_Project.Models.DTOs;
+@model SetPhonenumberDTO
+@{
+    ViewData["Title"] = "Set Phonenumber";
+}
+<h4>Please enter your phonenumber:</h4>
+<br />
+<div class="row">
+    <div class="col-md-4">
+        @if (TempData["Errors"] != null)
+        {
+            <div class="alert alert-danger">
+                <text>@TempData["Errors"]</text>
+            </div>
+        }
+        <form asp-action="SetPhonenumber" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Phonenumber" class="control-label"></label>
+                <input asp-for="Phonenumber" class="form-control" />
+                <span asp-validation-for="Phonenumber" class="text-danger"></span>
+            </div>
+            <br />
+            <div class="form-group">
+                <input type="submit" value="Set" class="btn btn-success" />
+            </div>
+        </form>
+    </div>
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+

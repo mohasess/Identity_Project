@@ -21,7 +21,7 @@ namespace Identity_Project.Areas.Admin.Controllers
 
         public IActionResult Index()
         {
-            var users = _userManager.Users.Where(u => u.EmailConfirmed == true).Select(u => new UserListDTO()
+            var users = _userManager.Users/*.Where(u => u.EmailConfirmed == true)*/.Select(u => new UserListDTO()
             {
                 Id = u.Id,
                 Firstname = u.Firstname,
@@ -35,7 +35,6 @@ namespace Identity_Project.Areas.Admin.Controllers
 
             return View(users);
         }
-
         public IActionResult Create()
         {
             return View();
@@ -67,6 +66,7 @@ namespace Identity_Project.Areas.Admin.Controllers
         public IActionResult Edit(UserEditDTO userEditDTO)
         {
             var user = _userManager.FindByIdAsync(userEditDTO.Id).Result;
+            // will get exception if dont use "user" on top cause entity already tracked by .net core!!! 
             //var userMapped = AutoMapperConfig.mapper.Map<UserEditDTO, User>(userEditDTO);
             user.Firstname = userEditDTO.Firstname;
             user.Lastname = userEditDTO.Lastname;
@@ -85,7 +85,6 @@ namespace Identity_Project.Areas.Admin.Controllers
             TempData["Errors"] = messages;
             return View(userEditDTO);
         }
-        
         public IActionResult Delete(string id)
         {
             var user = _userManager.FindByIdAsync(id).Result;

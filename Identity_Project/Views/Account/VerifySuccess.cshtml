@@ -1,0 +1,13 @@
+﻿
+@{
+    ViewData["Title"] = "Verify Success";
+}
+<br />
+<h4 class="alert-success">شماره همراه شما با موفقیت تایید شد</h4>
+<br />
+<a class="btn btn-primary" asp-action="Index" asp-controller="Home">بازگشت به صفحه اصلی</a>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
