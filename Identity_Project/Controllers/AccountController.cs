@@ -36,11 +36,12 @@ namespace Identity_Project.Controllers
             var messages = "";
             if (result.Succeeded)
             {
-                var token = _userManager.GenerateEmailConfirmationTokenAsync(user).Result;
-                var combackUrl = Url.Action("ConfirmEmail", "Account", new { token = token, id = user.Id }, protocol: Request.Scheme);
-                var body = string.Format($"از طریق لینک زیر حساب کاربری خود را فعال سازی کنید <br/> <a href={combackUrl}>لینک فعال سازی</a>");
-                _emailService.SendEmail(user.Email, body, "تایید حساب کاربری");
-                return RedirectToAction("DisplayEmail", "Account", new { email = user.Email});
+                RedirectToAction(nameof(SendVerificationEmail), new { email = user.Email });
+                //var token = _userManager.GenerateEmailConfirmationTokenAsync(user).Result;
+                //var combackUrl = Url.Action("ConfirmEmail", "Account", new { token = token, id = user.Id }, protocol: Request.Scheme);
+                //var body = string.Format($"از طریق لینک زیر حساب کاربری خود را فعال سازی کنید <br/> <a href={combackUrl}>لینک فعال سازی</a>");
+                //_emailService.SendEmail(user.Email, body, "تایید حساب کاربری");
+                //return RedirectToAction("DisplayEmail", "Account", new { email = user.Email});
             }
             foreach (var error in result.Errors)
             {
@@ -49,6 +50,15 @@ namespace Identity_Project.Controllers
 
             TempData["Messages"] = messages;
             return View(registerDTO);
+        }
+        public IActionResult SendVerificationEmail(string email)
+        {
+            var user = _userManager.FindByNameAsync(email).Result;
+            var token = _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var combackUrl = Url.Action("ConfirmEmail", "Account", new { id = user.Id, token = token }, protocol: Request.Scheme);
+            var body = string.Format($"از طریق لینک زیر حساب کاربری خود را فعال سازی کنید <br/> <a href={combackUrl}>لینک فعال سازی</a>");
+            _emailService.SendEmail(user.Email,body,"تایید حساب کاربری");
+            return RedirectToAction(nameof(DisplayEmail), "Account", new { email = user.Email });
         }
         public IActionResult DisplayEmail(string email)
         {
@@ -90,6 +100,11 @@ namespace Identity_Project.Controllers
                 return View(loginDTO);
             }
             var user = _userManager.FindByNameAsync(loginDTO.Email).Result;
+            if (user is null)
+            {
+                TempData["Errors"] = "Login failed - Email or password is incorrect!";
+                return View(loginDTO);
+            }
             // if user was already signed in :
             _signInManager.SignOutAsync();
 
@@ -101,12 +116,6 @@ namespace Identity_Project.Controllers
             {
                 return Redirect(loginDTO.ReturnUrl);
             }
-            else
-            {
-                TempData["Errors"] = "Login failed - Email or password is incorrect!";
-                return View(loginDTO);
-            }
-            // User will locked out if try many incompleted attempts
             if (result.IsLockedOut)
             {
                 TempData["Errors"] = "Login failed - User is locked temporary!";
@@ -117,12 +126,63 @@ namespace Identity_Project.Controllers
                 TempData["Errors"] = "Login failed - User is not allowed!";
                 return View(loginDTO);
             }
-            // Need two step verification
             if (result.RequiresTwoFactor)
             {
-                //;
+                return RedirectToAction(nameof(TwoFactorLogin),new { email = user.Email, isPersistence = loginDTO.IsPersistence, returnUrl = loginDTO.ReturnUrl});
             }
-            return View(loginDTO);
+            else
+            {
+                TempData["Errors"] = "Login failed - Email or password is incorrect!";
+                return View(loginDTO);
+            }
+        }
+        public IActionResult TwoFactorLogin(string email,bool isPersistence,string returnUrl)
+        {
+            var user = _userManager.FindByNameAsync(email).Result;
+            var providers = _userManager.GetValidTwoFactorProvidersAsync(user).Result;
+            var loginTwoFactorDTO = new TwoFactorLoginDTO()
+            {
+                IsPersistence = isPersistence,
+                ReturnUrl = returnUrl
+            };
+            if (providers.Contains("Email"))
+            {
+                var token = _userManager.GenerateTwoFactorTokenAsync(user, "Email").Result;
+                var body = string.Format($"Identity_Project <br/> Two factor login code : {token}");
+                _emailService.SendEmail(user.Email, body, "Login code");
+                loginTwoFactorDTO.Provider = "Email";
+            }
+            else if(providers.Contains("Phone"))
+            {
+                var token = _userManager.GenerateTwoFactorTokenAsync(user, "Phone").Result;
+                _smsService.SendSms(user.PhoneNumber, token);
+                loginTwoFactorDTO.Provider = "Phone";
+            }
+            return View(loginTwoFactorDTO);
+        }
+        [HttpPost]
+        public IActionResult TwoFactorLogin(TwoFactorLoginDTO twoFactorLoginDTO)
+        {
+            var user = _signInManager.GetTwoFactorAuthenticationUserAsync().Result;
+            if (user == null)
+                return NotFound();
+            var result = _signInManager.TwoFactorSignInAsync(twoFactorLoginDTO.Provider,
+                                                             twoFactorLoginDTO.Code,
+                                                             twoFactorLoginDTO.IsPersistence,
+                                                             false).Result;
+            if (result.Succeeded)
+                return Redirect(twoFactorLoginDTO.ReturnUrl); 
+            if (result.IsNotAllowed)
+            {
+                TempData["Error"] = "Login failed - your account is not allowed!";
+                return View();
+            }
+            if (result.IsLockedOut)
+            {
+                TempData["Error"] = "Login failed - your account has been locked out!";
+                return View();
+            }
+            return View();
         }
 
         public IActionResult LogOut()
@@ -226,6 +286,19 @@ namespace Identity_Project.Controllers
                 _userManager.UpdateAsync(user);
                 return View("VerifySuccess");
             }
+        }
+        [Authorize]
+        public IActionResult MyAccountInfo()
+        {
+            var user = _userManager.FindByNameAsync(User.Identity.Name).Result;
+            return View(AutoMapperConfig.mapper.Map<User,MyAccountInfoDTO>(user));
+        }
+        [Authorize]
+        public IActionResult TwoFactorEnabled()
+        {
+            var user = _userManager.FindByNameAsync(User.Identity.Name).Result;
+            var result = _userManager.SetTwoFactorEnabledAsync(user, !user.TwoFactorEnabled).Result;
+            return RedirectToAction(nameof(MyAccountInfo));
         }
     }
 }

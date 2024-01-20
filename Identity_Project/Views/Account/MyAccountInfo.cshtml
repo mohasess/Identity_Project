@@ -1,0 +1,76 @@
+﻿@model Identity_Project.Models.DTOs.MyAccountInfoDTO
+
+@{
+    ViewData["Title"] = "MyAccountInfo";
+}
+<br />
+<h1>@Model.Firstname's account info</h1>
+<br />
+<div>
+
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Firstname)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Firstname)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Lastname)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Lastname)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Username)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Username)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Email)
+            @if(Model.EmailConfirmed)
+            {
+                <span class="btn btn-success">Confirmed</span>
+            }
+            else
+            {
+                <a asp-action="SendVerificationEmail" asp-route-email="@Model.Email" class="btn btn-danger">Click to confirm</a>
+            }
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.PhoneNumber)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.PhoneNumber)
+            @if (Model.PhoneNumberConfirmed)
+            {
+                <span class="btn btn-success">Confirmed</span>
+            }
+            else
+            {
+                <a asp-action="SetPhonenumber" class="btn btn-danger">Click to confirm</a>
+            }
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.TwoFactorEnabled)
+        </dt>
+        <dd class = "col-sm-10">
+            @if (Model.TwoFactorEnabled)
+            {
+                <a asp-action="TwoFactorEnabled" class="btn btn-success">Click to Disable</a>
+            }
+            else
+            {
+                <a asp-action="TwoFactorEnabled" class="btn btn-danger">Click to Enable</a>
+            }
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="" class="btn btn-warning" asp-route-id="@Model.Id">Edit</a>
+</div>

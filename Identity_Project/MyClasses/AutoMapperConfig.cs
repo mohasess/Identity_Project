@@ -25,6 +25,8 @@ namespace Identity_Project.Services
                 t.CreateMap<Role, RoleEditDTO>();
                 t.CreateMap<User, UserListDTO>();
                 t.CreateMap<UserListDTO, User>();
+                t.CreateMap<MyAccountInfoDTO, User>();
+                t.CreateMap<User, MyAccountInfoDTO>();
 
             });
             mapper = configuration.CreateMapper();

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Identity_Project.Areas.Admin.Models.DTOs.UserDTOs;
 using Identity_Project.Areas.Admin.Models.DTOs.RoleDTOs;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Identity_Project.Models.DTOs;
 
 namespace Identity_Project.Data
 {
@@ -36,6 +37,9 @@ namespace Identity_Project.Data
         public DbSet<AddUserRoleDTO> AddUserRoles { get; set; } = default!;
 
         public DbSet<Identity_Project.Areas.Admin.Models.DTOs.RoleDTOs.RoleEditDTO> RoleEditDTO { get; set; } = default!;
+
+        public DbSet<Identity_Project.Models.DTOs.MyAccountInfoDTO> MyAccountInfoDTO { get; set; } = default!;
+
     }
 }
   

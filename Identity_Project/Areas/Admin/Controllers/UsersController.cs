@@ -1,4 +1,5 @@
 ﻿using Identity_Project.Areas.Admin.Models.DTOs.UserDTOs;
+using Identity_Project.Controllers;
 using Identity_Project.Models;
 using Identity_Project.Models.DTOs;
 using Identity_Project.Services;
@@ -47,8 +48,7 @@ namespace Identity_Project.Areas.Admin.Controllers
             var result = _userManager.CreateAsync(user, registerDTO.Password).Result;
             var messages = "";
             if (result.Succeeded)
-                return RedirectToAction("Index","Users", new { area = "Admin"});
-
+                RedirectToAction(nameof(Index), "Users");
             foreach (var error in result.Errors)
             {
                 messages += error.Description + Environment.NewLine;

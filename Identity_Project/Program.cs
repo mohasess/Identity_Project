@@ -1,4 +1,5 @@
 using Identity_Project.Data;
+using Identity_Project.Helpers;
 using Identity_Project.Models;
 using Identity_Project.Services;
 using Microsoft.AspNetCore.Identity;
@@ -22,7 +23,8 @@ builder.Services.AddDbContext<MADbContext>(opt =>
 
 builder.Services.AddIdentity<User, Role>()
     .AddEntityFrameworkStores<MADbContext>()
-    .AddDefaultTokenProviders();
+    .AddDefaultTokenProviders()
+    .AddErrorDescriber<CustomIdentityError>();
 
 builder.Services.AddScoped<RoleManager<Role>>();
 builder.Services.AddScoped<UserManager<User>>();
