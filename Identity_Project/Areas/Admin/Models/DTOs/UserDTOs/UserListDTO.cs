@@ -10,5 +10,6 @@
         public int AccessFailedCount { get; set; }
         public bool EmailConfirmed { get; set; }
         public bool LockoutEnabled { get; set; }
+        public DateTime BirthDate { get; set; }
     }
 }

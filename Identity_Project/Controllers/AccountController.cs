@@ -36,7 +36,7 @@ namespace Identity_Project.Controllers
             var messages = "";
             if (result.Succeeded)
             {
-                RedirectToAction(nameof(SendVerificationEmail), new { email = user.Email });
+                return RedirectToAction(nameof(SendVerificationEmail), new { email = user.Email });
                 //var token = _userManager.GenerateEmailConfirmationTokenAsync(user).Result;
                 //var combackUrl = Url.Action("ConfirmEmail", "Account", new { token = token, id = user.Id }, protocol: Request.Scheme);
                 //var body = string.Format($"از طریق لینک زیر حساب کاربری خود را فعال سازی کنید <br/> <a href={combackUrl}>لینک فعال سازی</a>");
@@ -54,7 +54,7 @@ namespace Identity_Project.Controllers
         public IActionResult SendVerificationEmail(string email)
         {
             var user = _userManager.FindByNameAsync(email).Result;
-            var token = _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var token = _userManager.GenerateEmailConfirmationTokenAsync(user).Result;
             var combackUrl = Url.Action("ConfirmEmail", "Account", new { id = user.Id, token = token }, protocol: Request.Scheme);
             var body = string.Format($"از طریق لینک زیر حساب کاربری خود را فعال سازی کنید <br/> <a href={combackUrl}>لینک فعال سازی</a>");
             _emailService.SendEmail(user.Email,body,"تایید حساب کاربری");
@@ -136,6 +136,7 @@ namespace Identity_Project.Controllers
                 return View(loginDTO);
             }
         }
+        [HttpGet]
         public IActionResult TwoFactorLogin(string email,bool isPersistence,string returnUrl)
         {
             var user = _userManager.FindByNameAsync(email).Result;
@@ -163,6 +164,7 @@ namespace Identity_Project.Controllers
         [HttpPost]
         public IActionResult TwoFactorLogin(TwoFactorLoginDTO twoFactorLoginDTO)
         {
+            // Get user with saved cookies in browser
             var user = _signInManager.GetTwoFactorAuthenticationUserAsync().Result;
             if (user == null)
                 return NotFound();
@@ -197,7 +199,7 @@ namespace Identity_Project.Controllers
         [HttpPost]
         public IActionResult ForgetPassword(ForgetPasswordDTO forgetPasswordDTO)
         {
-            var user = _userManager.FindByEmailAsync(forgetPasswordDTO.Email.ToLower().Trim()).Result;
+            var user = _userManager.FindByEmailAsync(forgetPasswordDTO.Email.Trim()).Result;
             var token = _userManager.GeneratePasswordResetTokenAsync(user).Result;
             var combackUrl = Url.Action("ResetPassword", "Account", new { token = token, id = user.Id }, protocol: Request.Scheme);
             var body = string.Format($"از طریق لینک زیر نسبت به تغییر رمز خود اقدام نمایید <br/>" +
@@ -256,8 +258,6 @@ namespace Identity_Project.Controllers
                 return View();
             }
             var code = _userManager.GenerateChangePhoneNumberTokenAsync(user, setPhonenumberDTO.Phonenumber).Result;
-            // api error : نیازمند سطح دسترسی بالا
-            //_smsService.SendCustomSms(setPhonenumberDTO.Phonenumber, "اوقات خوشی رو براتون آرزومندیم بی ناموس");
             _smsService.SendSms(setPhonenumberDTO.Phonenumber, code);
             return RedirectToAction("VerifyPhonenumber", "Account", new { phonenumber = setPhonenumberDTO.Phonenumber });
         }
@@ -299,6 +299,11 @@ namespace Identity_Project.Controllers
             var user = _userManager.FindByNameAsync(User.Identity.Name).Result;
             var result = _userManager.SetTwoFactorEnabledAsync(user, !user.TwoFactorEnabled).Result;
             return RedirectToAction(nameof(MyAccountInfo));
+        }
+        [AllowAnonymous]
+        public IActionResult AccessDenied(string? returnUrl)
+        {
+            return View();
         }
     }
 }

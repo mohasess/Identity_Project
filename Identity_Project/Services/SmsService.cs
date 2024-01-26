@@ -16,10 +16,5 @@ namespace Identity_Project.Services
             _api.VerifyLookup(receptor, code, "verifyPhonenumberForIdentityProject");
             return Task.CompletedTask;
         }
-        public Task SendCustomSms(string receptor, string message)
-        {
-            _api.Send("1000689696", receptor,message);
-            return Task.CompletedTask;
-        }
     }
 }

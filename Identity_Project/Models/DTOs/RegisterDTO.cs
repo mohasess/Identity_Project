@@ -11,6 +11,8 @@ namespace Identity_Project.Models.DTOs
         [Required]
         [EmailAddress]
         public string Email { get; set; }
+        [DataType(DataType.Date)]
+        public DateTime BirthDate { get; set; }
         [DataType(DataType.Password)]
         [Required]
         public string Password { get; set; }
@@ -18,5 +20,6 @@ namespace Identity_Project.Models.DTOs
         [DataType(DataType.Password)]
         [Compare(nameof(Password))]
         public string ConfirmPassword { get; set; }
+
     }
 }

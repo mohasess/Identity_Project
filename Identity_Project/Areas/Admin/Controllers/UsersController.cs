@@ -32,6 +32,7 @@ namespace Identity_Project.Areas.Admin.Controllers
                 AccessFailedCount = u.AccessFailedCount,
                 EmailConfirmed = u.EmailConfirmed,
                 LockoutEnabled = u.LockoutEnabled,
+                BirthDate = u.BirthDate,
             });
 
             return View(users);
@@ -73,6 +74,7 @@ namespace Identity_Project.Areas.Admin.Controllers
             user.Email = userEditDTO.Email;
             user.UserName = userEditDTO.Username;
             user.PhoneNumber = userEditDTO.Phonenumber;
+            user.BirthDate = userEditDTO.BirthDate;
             var result = _userManager.UpdateAsync(user).Result;
             var messages = "";
             if (result.Succeeded)

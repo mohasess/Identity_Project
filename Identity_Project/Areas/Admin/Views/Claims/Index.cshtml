@@ -1,0 +1,63 @@
+﻿@model IEnumerable<System.Security.Claims.Claim>
+@{
+    ViewData["Title"] = "User Claims";
+}
+<h1>Index</h1>
+@if (ViewData["DeleteStatus"] != null)
+{
+    <br />
+    <div class="alert alert-danger">
+        <text>@ViewData["DeleteStatus"]</text>
+    </div>
+    <br />
+}
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Subject
+            </th>
+            <th>
+                Issuer
+            </th>
+            <th>
+                Type
+            </th>
+            <th>
+                Value
+            </th>
+            <th>
+                Value Type
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Subject.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Issuer)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Type)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Value)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ValueType)
+                </td>
+                <td><a asp-action="Delete" asp-route-claimType="@item.Type" class="btn btn-danger">Delete</a></td>
+            </tr>
+        }
+    </tbody>
+</table>
+<br />
+
+<p>
+    <a asp-action="Create" class="btn btn-success">Add New Claim</a>
+</p>
