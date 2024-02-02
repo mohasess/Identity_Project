@@ -52,10 +52,12 @@ builder.Services.AddScoped<IClaimsTransformation, CustomClaimTransform>();
 
 
 
+// for each handler you write, you need a an activator in program.cs
 
 // to activate AuthorizationHandler and its implementation
 builder.Services.AddSingleton<IAuthorizationHandler, UserAgeHandler>();
-
+builder.Services.AddSingleton<IAuthorizationHandler, UserBlogHandler>();
+builder.Services.AddSingleton<IAuthorizationHandler, UserBlogListDTOHandler>(); 
 
 builder.Services.AddAuthorization(options =>
 {
@@ -76,18 +78,24 @@ builder.Services.AddAuthorization(options =>
     // user should has "VerifiedAge" claim with value 18 or higher 
     options.AddPolicy("VerifiedAgeByHandler", policy =>
     {
+        policy.RequireAuthenticatedUser();
         policy.AddRequirements(new UserClaimsRequirements(18));
     });
+
+    //***************************************************************
+
+    // policy to check author and editor of a blog be the same person
+    options.AddPolicy("UserBlogPolicyHandler", policy =>
+    {
+        policy.AddRequirements(new UserClaimsRequirements());
+    });
+
+    // User should have admin role to authorize
+    options.AddPolicy("AdminVerifiedPolicy", policy =>
+    {
+        policy.RequireRole("Admin");
+    });
 });
-
-
-
-
-
-
-
-
-
 
 //How to change Identity options?
 

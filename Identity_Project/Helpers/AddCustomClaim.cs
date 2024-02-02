@@ -21,9 +21,7 @@ namespace Identity_Project.Helpers
             var identity = await base.GenerateClaimsAsync(user);
             identity.AddClaim(new Claim("FullName",$"{user.Firstname} {user.Lastname}", ClaimValueTypes.String));
             identity.AddClaim(new Claim("LoginDate", DateTime.Now.ToString(), ClaimValueTypes.String));
-            return identity;
+            return await Task.FromResult(identity);
         }
     }
-
-
 }

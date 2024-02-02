@@ -9,7 +9,9 @@ namespace Identity_Project.Areas.Admin.Controllers
 {
     [Area("Admin")]
     // Will check "saRolePolicy" before take access
-    [Authorize(Policy = "saRolePolicy")]
+    //[Authorize(Policy = "saRolePolicy")]
+    [Authorize(Policy = "VerifiedAgeByHandler")]
+    [Authorize(Roles = "Admin")]
     public class ClaimsController : Controller
     {
         private readonly UserManager<User> _userManager;
@@ -20,7 +22,7 @@ namespace Identity_Project.Areas.Admin.Controllers
         }
 
         // Will check "VerifiedAgePolicy" before take 
-        [Authorize(Policy = "VerifiedAgePolicy")]
+        //[Authorize(Policy = "VerifiedAgePolicy")]
         public IActionResult Index()
         {
             return View(User.Claims);

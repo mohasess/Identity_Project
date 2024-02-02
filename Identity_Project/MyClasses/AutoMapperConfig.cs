@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Identity_Project.Areas.Admin.Models.DTOs.BlogDTOs;
 using Identity_Project.Areas.Admin.Models.DTOs.RoleDTOs;
 using Identity_Project.Areas.Admin.Models.DTOs.UserDTOs;
 using Identity_Project.Models;
@@ -27,6 +28,12 @@ namespace Identity_Project.Services
                 t.CreateMap<UserListDTO, User>();
                 t.CreateMap<MyAccountInfoDTO, User>();
                 t.CreateMap<User, MyAccountInfoDTO>();
+                t.CreateMap<Blog, BlogListDTO>();
+                t.CreateMap<BlogListDTO, Blog>();
+                t.CreateMap<Blog, BlogCreateDTO>();
+                t.CreateMap<BlogCreateDTO, Blog>();
+                t.CreateMap<BlogEditDTO, Blog>();
+                t.CreateMap<Blog, BlogEditDTO>();
 
             });
             mapper = configuration.CreateMapper();

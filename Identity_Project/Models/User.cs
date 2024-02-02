@@ -9,5 +9,6 @@ namespace Identity_Project.Models
         public string Lastname { get; set; }
         [DataType(DataType.Date)]
         public DateTime BirthDate { get; set; }
+        public ICollection<Blog> Blogs { get; set; }
     }
 }

@@ -6,11 +6,14 @@ using Identity_Project.Areas.Admin.Models.DTOs.UserDTOs;
 using Identity_Project.Areas.Admin.Models.DTOs.RoleDTOs;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Identity_Project.Models.DTOs;
+using Identity_Project.Areas.Admin.Models.DTOs.BlogDTOs;
 
 namespace Identity_Project.Data
 {
     public class MADbContext : IdentityDbContext<User,Role,string>
     {
+        public DbSet<Blog> Blogs { get; set; }
+
         public MADbContext(DbContextOptions<MADbContext> options) : base(options)
         {
 
@@ -39,6 +42,10 @@ namespace Identity_Project.Data
         public DbSet<Identity_Project.Areas.Admin.Models.DTOs.RoleDTOs.RoleEditDTO> RoleEditDTO { get; set; } = default!;
 
         public DbSet<Identity_Project.Models.DTOs.MyAccountInfoDTO> MyAccountInfoDTO { get; set; } = default!;
+
+        public DbSet<Identity_Project.Areas.Admin.Models.DTOs.BlogDTOs.BlogListDTO> BlogListDTO { get; set; } = default!;
+
+        public DbSet<Identity_Project.Areas.Admin.Models.DTOs.BlogDTOs.BlogEditDTO> BlogEditDTO { get; set; } = default!;
 
     }
 }
