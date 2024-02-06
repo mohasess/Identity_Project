@@ -67,35 +67,54 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole("sa");
         policy.RequireClaim("saSignedIn");
     });
-
     // user should have authenticated and has "VerifiedAge" claim with value 18 or higher 
-     options.AddPolicy("VerifiedAgePolicy", policy =>
+    options.AddPolicy("VerifiedAgePolicy", policy =>
     {
-        policy.RequireAuthenticatedUser();
-        policy.RequireClaim("VerifiedAge", "true");
+       policy.RequireAuthenticatedUser();
+       policy.RequireClaim("VerifiedAge", "true");
     });
-
     // user should has "VerifiedAge" claim with value 18 or higher 
     options.AddPolicy("VerifiedAgeByHandler", policy =>
     {
         policy.RequireAuthenticatedUser();
         policy.AddRequirements(new UserClaimsRequirements(18));
     });
-
     //***************************************************************
-
     // policy to check author and editor of a blog be the same person
     options.AddPolicy("UserBlogPolicyHandler", policy =>
     {
         policy.AddRequirements(new UserClaimsRequirements());
     });
-
     // User should have admin role to authorize
     options.AddPolicy("AdminVerifiedPolicy", policy =>
     {
         policy.RequireRole("Admin");
     });
 });
+
+
+
+
+builder.Services.AddAuthentication()
+    .AddGoogle(options =>
+    {
+        options.ClientId = "410039922230-1gpsgskirrgc7dih79oht422q0g3r9ib.apps.googleusercontent.com";
+        options.ClientSecret = "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";
+
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //How to change Identity options?
 

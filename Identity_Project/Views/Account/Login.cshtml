@@ -44,7 +44,9 @@
             <input asp-for="ReturnUrl" hidden />
             <br />
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-success" /> | <a asp-action="Index" asp-controller="Home" class="btn btn-primary">Back to Home</a>
+                <input type="submit" value="Login" class="btn btn-success" /> | <a asp-action="Index" asp-controller="Home" class="btn btn-primary">Back to Home</a>
+                @* below line added for google login *@
+                | <a asp-action="ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" asp-route-provider="Google" class="btn btn-danger">Sign in with Google</a>
             </div>
         </form>
     </div>

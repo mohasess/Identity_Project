@@ -1,7 +1,6 @@
 ﻿using Humanizer;
 using Identity_Project.Models;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 
@@ -9,7 +8,6 @@ namespace Identity_Project.Helpers
 {
     public class CustomClaimTransform : IClaimsTransformation
     {
-        private readonly IAuthorizationService _authorizeService;
         private readonly UserManager<User> _userManager;
         public CustomClaimTransform(UserManager<User> userManager)
         {

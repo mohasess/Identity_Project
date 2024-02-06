@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Identity_Project.Controllers
 {
@@ -304,6 +305,59 @@ namespace Identity_Project.Controllers
         public IActionResult AccessDenied(string? returnUrl)
         {
             return View();
+        }
+
+        [AllowAnonymous]
+        public IActionResult ExternalLogin(string provider, string returnUrl)
+        {
+            var url = Url.Action(nameof(ExternalCallBack), "Account", new { returnUrl } /*, protocol: Request.Scheme */);
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, url);
+            return new ChallengeResult(provider, properties);
+        }
+
+        public IActionResult ExternalCallBack(string returnUrl)
+        {
+            var loginInfo = _signInManager.GetExternalLoginInfoAsync().Result;
+            if (loginInfo == null)
+                return BadRequest();
+            var email = loginInfo.Principal.FindFirst(ClaimTypes.Email)?.Value?? null;
+            if (email == null)
+                return NotFound();
+            var firstName = loginInfo.Principal.FindFirst(ClaimTypes.GivenName)?.Value ?? null;
+            var lastName = loginInfo.Principal.FindFirst(ClaimTypes.Surname)?.Value ?? null;
+            // 1. if it's first time user sign in with google, below line will fail: cause he has no info such as login or users or roles info in our database to find or authenticate 
+            var sigInResult = _signInManager.ExternalLoginSignInAsync(loginInfo.LoginProvider, loginInfo.ProviderKey, true, true).Result;
+            if (sigInResult.Succeeded)
+            {
+                if (Url.IsLocalUrl(returnUrl))
+                    return Redirect(returnUrl);
+                else
+                    return RedirectToAction("Index", "Home");
+            }
+            else if(sigInResult.RequiresTwoFactor)
+            {
+                //TODO implement two factor login for google account
+            }
+            // 2. then we need to first create this user with CreateAsync(), add a login for him/her with AddLoginAsync() the sign him in with SignInAsync().
+            var user = _userManager.FindByEmailAsync(email).Result;
+            if (user == null)
+            {
+                user = new User
+                {
+                    UserName = email,
+                    Firstname = firstName,
+                    Lastname = lastName,
+                    Email = email,
+                    EmailConfirmed = true
+                };
+                _userManager.CreateAsync(user).Wait();
+            }
+            _userManager.AddLoginAsync(user, loginInfo).Wait();
+            _signInManager.SignInAsync(user, true).Wait();
+            if (Url.IsLocalUrl(returnUrl))
+                return Redirect(returnUrl);
+            else
+                return RedirectToAction("Index", "Home"); ;
         }
     }
 }

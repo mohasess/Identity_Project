@@ -18,7 +18,7 @@ namespace Identity_Project.Data
         {
 
         }
-
+       
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<IdentityUserLogin<string>>().HasKey(keys => new { keys.LoginProvider, keys.ProviderKey });
